@@ -1,47 +1,51 @@
-# 📄 CV Builder AI
+# 👾 CV Builder AI
 
-Gerador de Currículo Inteligente com **preview em tempo real** e melhorias automáticas por **Inteligência Artificial**.  
-O objetivo do projeto é permitir que usuários criem currículos profissionais de forma prática, moderna e interativa.
-
----
-
-## 🚀 Tecnologias Utilizadas
-
-- **React 19**  
-- **TypeScript**  
-- **TailwindCSS v4**  
-- **Vite**  
-- **OpenAI API**  
+Gerador de Currículo Inteligente com **preview em tempo real** e melhorias por **Inteligência Artificial**.  
+Projeto desenvolvido durante o [Programa Desenvolve](https://desenvolve.grupoboticario.com.br/) fornecido pelo [Grupo Boticário](https://www.grupoboticario.com.br/). 🌱
 
 ---
 
-## 💡 Conceito da Aplicação
+## 🚀 Tecnologias
 
-O **CV Builder AI** utiliza um layout em **Split-Screen**, dividido em duas colunas:
-
-- **Esquerda (50%)** → Formulário completo de entrada de dados.  
-- **Direita (50%)** → Preview atualizado do currículo em tempo real.  
-
-📌 O design é otimizado para **desktop** com foco em clareza e profissionalismo.
-
----
-
-## 📝 Seções do Formulário
-
-1. **Dados Pessoais** → Nome, email, telefone, LinkedIn, resumo.  
-2. **Habilidades** → Lista dinâmica com níveis de proficiência.  
-3. **Experiências** → Lista dinâmica de experiências profissionais.  
+- React 19  
+- TypeScript  
+- TailwindCSS v4  
+- Vite  
+- OpenAI API  
 
 ---
 
-## ⚙️ Funcionalidades Principais
+## 💡 Conceito
 
-- ✅ **Preview Instantâneo** → Alterações aparecem em tempo real.  
-- ✅ **Listas Dinâmicas** → Adicionar/remover habilidades e experiências.  
-- ✅ **Melhorias por IA** → Botões para aprimorar textos automaticamente.  
-- ✅ **Layout Desktop** → Interface otimizada para telas grandes.  
-- ✅ **Design Profissional** → Visual moderno e clean.  
+Layout em **split-screen** (duas colunas fixas):  
+- **Esquerda** → Formulário para entrada de dados  
+- **Direita** → Preview atualizado do currículo em tempo real  
 
 ---
 
+## 📝 Formulário
 
+- **Dados Pessoais**: nome, email, telefone, LinkedIn, resumo  
+- **Habilidades**: lista dinâmica com níveis de proficiência  
+- **Experiências**: empresa, cargo, período, descrição, trabalho atual  
+
+---
+
+## ⚙️ Funcionalidades
+
+- Preview instantâneo  
+- Listas dinâmicas (habilidades e experiências)  
+- Melhoria de textos por IA  
+- Validações e feedback visual  
+- Layout desktop otimizado  
+
+---
+
+## ▶️ Como rodar
+
+```bash
+git clone https://github.com/seu-usuario/cv-builder-ai.git
+cd cv-builder-ai
+npm install
+echo VITE_OPENAI_API_KEY="sua_api_key_aqui" > .env
+npm run dev
