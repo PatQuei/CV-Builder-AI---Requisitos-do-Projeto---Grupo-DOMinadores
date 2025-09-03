@@ -1,21 +1,42 @@
-import React from "react";
-
-const PreviewSection: React.FC = () => {
+export function PreviewSection() {
   return (
-    <section className="w-1/2 p-6 overflow-y-auto bg-gray-50">
-      <h2 className="text-lg font-semibold mb-4 text-green-700">
-        Preview do Currículo
-      </h2>
-      <p className="text-sm text-gray-500 mb-6">
-        Visualização em tempo real
-      </p>
-
-      {/* Placeholder do preview */}
-      <div className="bg-white shadow rounded-md p-6 min-h-[400px]">
-        <p className="text-gray-400 italic">[Preview do currículo]</p>
+    <div className="bg-white rounded-2xl p-6 shadow-lg">
+      <div className="bg-green-600 text-white p-3 rounded-lg mb-4">
+        <h2 className="text-lg font-bold">Preview do Currículo</h2>
+        <p className="text-sm text-gray-100">Visualização em tempo real</p>
       </div>
-    </section>
-  );
-};
 
-export default PreviewSection;
+      <div className="space-y-6">
+        {/* Cabeçalho do CV */}
+        <div>
+          <h3 className="text-xl font-semibold text-gray-800">Seu Nome Completo</h3>
+          <p className="text-gray-600 text-sm">seu.email@exemplo.com | (11) 99999-9999</p>
+          <p className="text-gray-600 text-sm">linkedin.com/in/seuusuario</p>
+          <p className="text-gray-500 mt-2 italic">
+            Seu resumo profissional aparecerá aqui...
+          </p>
+        </div>
+
+        <hr />
+
+        {/* Habilidades */}
+        <div>
+          <h4 className="text-lg font-semibold text-gray-700 mb-2">Habilidades</h4>
+          <p className="text-gray-400 italic">
+            Suas habilidades aparecerão aqui conforme você adiciona...
+          </p>
+        </div>
+
+        {/* Experiência Profissional */}
+        <div>
+          <h4 className="text-lg font-semibold text-gray-700 mb-2">
+            Experiência Profissional
+          </h4>
+          <p className="text-gray-400 italic">
+            Suas experiências profissionais aparecerão aqui...
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
