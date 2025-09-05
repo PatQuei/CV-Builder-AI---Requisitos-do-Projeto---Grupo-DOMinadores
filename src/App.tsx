@@ -7,7 +7,8 @@ export default function App() {
   const [formData, setFormData] = usePersistentState("cv-data", {
     nome: "",
     email: "",
-    telefone: "",
+    telefone: "",git commit -m "Adicionar persistência de dados 
+no localStorage"
     linkedin: "",
     resumo: "",
   });
