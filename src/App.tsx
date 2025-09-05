@@ -1,16 +1,17 @@
-import { useState } from "react";
 import { Mail, Phone, Linkedin, User, FileText, Key, Download, Briefcase, Moon, Sun,
 } from "lucide-react";
 import { useDarkMode } from "./hooks/useDarkMode";
+import { usePersistentState } from "./hooks/usePersistentState";
 
 export default function App() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = usePersistentState("cv-data", {
     nome: "",
     email: "",
     telefone: "",
     linkedin: "",
     resumo: "",
   });
+
 
   const { darkMode, setDarkMode } = useDarkMode();
 
