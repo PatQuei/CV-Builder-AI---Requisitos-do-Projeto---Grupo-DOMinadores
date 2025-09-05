@@ -1,7 +1,19 @@
 import { useState } from "react";
-import { Mail, Phone, Linkedin, User, FileText, Key, Download, Briefcase, Moon, Sun,
+import {
+  Mail,
+  Phone,
+  Linkedin,
+  User,
+  FileText,
+  Key,
+  Download,
+  Briefcase,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { useDarkMode } from "./hooks/useDarkMode";
+import type { ExperienceItem } from "./types/cv.types";
+import ExperienceForm from "./components/Form/Experience";
 
 export default function App() {
   const [formData, setFormData] = useState({
@@ -11,6 +23,8 @@ export default function App() {
     linkedin: "",
     resumo: "",
   });
+
+  const [experiences, setExperiences] = useState<ExperienceItem[]>([]);
 
   const { darkMode, setDarkMode } = useDarkMode();
 
@@ -73,6 +87,7 @@ export default function App() {
           </p>
 
           <div className="space-y-4">
+            {/* Nome */}
             <div>
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Nome Completo *
@@ -86,6 +101,8 @@ export default function App() {
                 className="w-full border rounded-lg px-3 py-2 mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               />
             </div>
+
+            {/* Email */}
             <div>
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Email *
@@ -99,6 +116,8 @@ export default function App() {
                 className="w-full border rounded-lg px-3 py-2 mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               />
             </div>
+
+            {/* Telefone */}
             <div>
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Telefone *
@@ -112,6 +131,8 @@ export default function App() {
                 className="w-full border rounded-lg px-3 py-2 mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               />
             </div>
+
+            {/* LinkedIn */}
             <div>
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 LinkedIn
@@ -125,6 +146,8 @@ export default function App() {
                 className="w-full border rounded-lg px-3 py-2 mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               />
             </div>
+
+            {/* Resumo */}
             <div>
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Resumo Profissional
@@ -137,6 +160,14 @@ export default function App() {
                 className="w-full border rounded-lg px-3 py-2 mt-1 h-24 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               />
             </div>
+          </div>
+
+          {/* 🔽 Formulário de Experiências */}
+          <div className="mt-6">
+            <ExperienceForm
+              experiences={experiences}
+              setExperiences={setExperiences}
+            />
           </div>
         </div>
 
@@ -169,8 +200,7 @@ export default function App() {
             </p>
 
             <p className="text-gray-500 dark:text-gray-400 mt-4">
-              {formData.resumo ||
-                "Seu resumo profissional aparecerá aqui..."}
+              {formData.resumo || "Seu resumo profissional aparecerá aqui..."}
             </p>
 
             <hr className="my-4 border-gray-200 dark:border-gray-700" />
@@ -188,9 +218,17 @@ export default function App() {
               <h4 className="font-bold flex items-center gap-2 text-gray-800 dark:text-white">
                 <Briefcase className="w-4 h-4" /> Experiência Profissional
               </h4>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Suas experiências profissionais aparecerão aqui...
-              </p>
+              <ul className="text-sm text-gray-500 dark:text-gray-400 mt-2 space-y-2">
+                {experiences.length > 0 ? (
+                  experiences.map((exp) => (
+                    <li key={exp.id} className="border p-2 rounded">
+                      <strong>{exp.position}</strong> - {exp.company}
+                    </li>
+                  ))
+                ) : (
+                  <p>Suas experiências profissionais aparecerão aqui...</p>
+                )}
+              </ul>
             </div>
           </div>
         </div>

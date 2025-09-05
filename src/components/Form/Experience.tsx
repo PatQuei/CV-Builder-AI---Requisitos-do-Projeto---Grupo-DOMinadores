@@ -1,84 +1,138 @@
-import { Experience } from "/src/types/cv.types.ts";
+import { useState } from "react";
+import type { ExperienceItem } from "../../types/cv.types";
 
-interface ExperienceSectionProps {
-  experiences: Experience[];
+interface ExperienceFormProps {
+  experiences: ExperienceItem[];
+  setExperiences: React.Dispatch<React.SetStateAction<ExperienceItem[]>>;
 }
 
-export const ExperienceSection = ({ experiences }: ExperienceSectionProps) => {
-  if (experiences.length === 0) return null;
+export default function ExperienceForm({
+  experiences,
+  setExperiences,
+}: ExperienceFormProps) {
+  const [form, setForm] = useState<ExperienceItem>({
+    id: crypto.randomUUID(),
+    company: "",
+    position: "",
+    startDate: "",
+    endDate: "",
+    isCurrent: false,
+    description: "",
+  });
 
-  const formatPeriod = (
-    startDate: string,
-    endDate: string,
-    isCurrentJob: boolean
+  // Atualiza os campos do form
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const formatDate = (dateString: string) => {
-      if (!dateString) return "";
+    const { name, value, type, checked } = e.target;
+    setForm({
+      ...form,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
 
-      // Handle YYYY-MM format
-      if (/^\d{4}-\d{2}$/.test(dateString)) {
-        const [year, month] = dateString.split("-");
-        const monthNames = [
-          "Jan",
-          "Fev",
-          "Mar",
-          "Abr",
-          "Mai",
-          "Jun",
-          "Jul",
-          "Ago",
-          "Set",
-          "Out",
-          "Nov",
-          "Dez",
-        ];
-        return `${monthNames[parseInt(month) - 1]} ${year}`;
-      }
+  // Adiciona experiência ao array
+  const addExperience = () => {
+    if (
+      form.startDate &&
+      !form.isCurrent &&
+      form.endDate &&
+      form.startDate > form.endDate
+    ) {
+      alert("Data de início não pode ser maior que a data de fim!");
+      return;
+    }
 
-      return dateString;
-    };
+    setExperiences([...experiences, form]);
 
-    const start = formatDate(startDate);
-    const end = isCurrentJob ? "Presente" : formatDate(endDate);
-
-    if (!start) return "";
-    return `${start} - ${end || "Presente"}`;
+    // limpa o form para o próximo cadastro
+    setForm({
+      id: crypto.randomUUID(),
+      company: "",
+      position: "",
+      startDate: "",
+      endDate: "",
+      isCurrent: false,
+      description: "",
+    });
   };
 
   return (
-    <div>
-      <h2 className="text-lg font-semibold text-foreground mb-3 border-b border-border pb-1">
-        Experiência Profissional
-      </h2>
-      <div className="space-y-4">
-        {experiences.map((experience) => (
-          <div key={experience.id} className="space-y-2">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="font-semibold text-foreground">
-                  {experience.position || "Cargo"}
-                </h3>
-                <p className="text-primary font-medium text-sm">
-                  {experience.company || "Nome da Empresa"}
-                </p>
-              </div>
-              <span className="text-xs text-muted-foreground whitespace-nowrap ml-4">
-                {formatPeriod(
-                  experience.startDate,
-                  experience.endDate,
-                  experience.isCurrentJob
-                )}
-              </span>
-            </div>
+    <div className="p-4 border rounded-xl shadow-sm mt-6">
+      <h2 className="text-lg font-semibold mb-4">Experiências Profissionais</h2>
 
-            {experience.description && (
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {experience.description}
-              </p>
-            )}
-          </div>
-        ))}
+      <input
+        type="text"
+        name="company"
+        placeholder="Empresa"
+        value={form.company}
+        onChange={handleChange}
+        className="block w-full p-2 border rounded mb-2"
+      />
+
+      <input
+        type="text"
+        name="position"
+        placeholder="Cargo"
+        value={form.position}
+        onChange={handleChange}
+        className="block w-full p-2 border rounded mb-2"
+      />
+
+      <div className="flex gap-2 mb-2">
+        <input
+          type="month"
+          name="startDate"
+          value={form.startDate}
+          onChange={handleChange}
+          className="p-2 border rounded"
+        />
+        {!form.isCurrent && (
+          <input
+            type="month"
+            name="endDate"
+            value={form.endDate}
+            onChange={handleChange}
+            className="p-2 border rounded"
+          />
+        )}
       </div>
+
+      <label className="flex items-center gap-2 mb-2">
+        <input
+          type="checkbox"
+          name="isCurrentJob"
+          checked={form.isCurrent}
+          onChange={handleChange}
+        />
+        Trabalho atual
+      </label>
+
+      <textarea
+        name="description"
+        placeholder="Descrição das atividades"
+        value={form.description}
+        onChange={handleChange}
+        className="block w-full p-2 border rounded mb-2"
+      />
+
+      <button
+        onClick={addExperience}
+        className="bg-purple-600 text-white px-4 py-2 rounded-lg"
+      >
+        Adicionar Experiência
+      </button>
+
+      {/* Lista das experiências já adicionadas */}
+      <ul className="mt-4 space-y-2">
+        {experiences.map((exp) => (
+          <li key={exp.id} className="border p-2 rounded text-sm">
+            <strong>{exp.position}</strong> - {exp.company}
+            <br />
+            {exp.startDate} - {exp.isCurrent ? "Presente" : exp.endDate}
+          </li>
+        ))}
+      </ul>
     </div>
   );
-};
+}
