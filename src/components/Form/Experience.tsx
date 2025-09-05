@@ -101,7 +101,7 @@ export default function ExperienceForm({
       <label className="flex items-center gap-2 mb-2">
         <input
           type="checkbox"
-          name="isCurrentJob"
+          name="isCurrent"
           checked={form.isCurrent}
           onChange={handleChange}
         />
