@@ -1,19 +1,34 @@
-import { Mail, Phone, Linkedin, User, FileText, Key, Download, Briefcase, Moon, Sun,
+import React from "react";
+import {
+  Mail,
+  Phone,
+  Linkedin,
+  User,
+  FileText,
+  Key,
+  Download,
+  Briefcase,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { useDarkMode } from "./hooks/useDarkMode";
 import { usePersistentState } from "./hooks/usePersistentState";
+import { useAutoSaveToast } from "./hooks/useAutoSaveToast";
 
 export default function App() {
+  // Estado do formulário
   const [formData, setFormData] = usePersistentState("cv-data", {
     nome: "",
     email: "",
-    telefone: "",git commit -m "Adicionar persistência de dados 
-no localStorage"
+    telefone: "",
     linkedin: "",
     resumo: "",
   });
 
+  // Hook do toast de auto-save
+  const { ToastComponent } = useAutoSaveToast("cv-data", formData);
 
+  // Dark mode
   const { darkMode, setDarkMode } = useDarkMode();
 
   const handleChange = (
@@ -157,22 +172,18 @@ no localStorage"
             </h3>
             <div className="flex gap-4 text-sm text-gray-600 dark:text-gray-300 mt-2">
               <span className="flex items-center gap-1">
-                <Mail className="w-4 h-4" />{" "}
-                {formData.email || "seu.email@exemplo.com"}
+                <Mail className="w-4 h-4" /> {formData.email || "seu.email@exemplo.com"}
               </span>
               <span className="flex items-center gap-1">
-                <Phone className="w-4 h-4" />{" "}
-                {formData.telefone || "(11) 99999-9999"}
+                <Phone className="w-4 h-4" /> {formData.telefone || "(11) 99999-9999"}
               </span>
             </div>
             <p className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300 mt-1">
-              <Linkedin className="w-4 h-4" />{" "}
-              {formData.linkedin || "linkedin.com/in/seuusuario"}
+              <Linkedin className="w-4 h-4" /> {formData.linkedin || "linkedin.com/in/seuusuario"}
             </p>
 
             <p className="text-gray-500 dark:text-gray-400 mt-4">
-              {formData.resumo ||
-                "Seu resumo profissional aparecerá aqui..."}
+              {formData.resumo || "Seu resumo profissional aparecerá aqui..."}
             </p>
 
             <hr className="my-4 border-gray-200 dark:border-gray-700" />
@@ -197,6 +208,9 @@ no localStorage"
           </div>
         </div>
       </main>
+
+      {/* Toast de auto-save */}
+      <ToastComponent />
     </div>
   );
 }
