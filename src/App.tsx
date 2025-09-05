@@ -1,4 +1,5 @@
-import React from "react";
+
+import { useState } from "react";
 import {
   Mail,
   Phone,
@@ -10,10 +11,16 @@ import {
   Briefcase,
   Moon,
   Sun,
+  Sparkles,
 } from "lucide-react";
 import { useDarkMode } from "./hooks/useDarkMode";
+import type { ExperienceItem } from "./types/cv.types";
+import ExperienceForm from "./components/Form/Experience";
+import { generateSummaryGemini } from "./services/aiService";
+import jsPDF from "jspdf";
 import { usePersistentState } from "./hooks/usePersistentState";
 import { useAutoSaveToast } from "./hooks/useAutoSaveToast";
+
 
 export default function App() {
   // Estado do formulário
@@ -25,16 +32,114 @@ export default function App() {
     resumo: "",
   });
 
-  // Hook do toast de auto-save
+
+
   const { ToastComponent } = useAutoSaveToast("cv-data", formData);
 
-  // Dark mode
+
+  const [experiences, setExperiences] = useState<ExperienceItem[]>([]);
+  const [apiKey, setApiKey] = useState("");
+
   const { darkMode, setDarkMode } = useDarkMode();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // 🔹 Geração de resumo com IA
+  const handleGenerateSummary = async () => {
+    if (
+      !formData.nome ||
+      !formData.email ||
+      !formData.telefone ||
+      !formData.linkedin ||
+      !formData.resumo ||
+      experiences.length === 0
+    ) {
+      alert(
+        "Por favor, preencha todas as informações (incluindo experiências) antes de gerar o resumo com IA."
+      );
+      return;
+    }
+
+    if (!apiKey) {
+      alert("Insira sua API Key para usar a IA.");
+      return;
+    }
+
+    try {
+      const resumo = await generateSummaryGemini(apiKey, formData, experiences);
+      setFormData({ ...formData, resumo });
+    } catch (error) {
+      console.error(error);
+      alert("Erro ao gerar resumo com IA.");
+    }
+  };
+
+  // 🔹 Exportar PDF
+  const exportPDF = () => {
+    const doc = new jsPDF();
+
+    // 🔹 Cabeçalho com nome
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.text(formData.nome || "Seu Nome Completo", 20, 20);
+
+    // 🔹 Contatos logo abaixo
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Email: ${formData.email}`, 20, 30);
+    doc.text(`Telefone: ${formData.telefone}`, 20, 36);
+    doc.text(`LinkedIn: ${formData.linkedin}`, 20, 42);
+
+    // 🔹 Linha separadora
+    doc.setDrawColor(150);
+    doc.line(20, 48, 190, 48);
+
+    // 🔹 Resumo
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text("Resumo Profissional", 20, 60);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.text(formData.resumo || "Não informado", 20, 70, { maxWidth: 170 });
+
+    // 🔹 Experiências
+    let y = 95;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text("Experiências Profissionais", 20, y);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    y += 10;
+
+    experiences.forEach((exp, i) => {
+      doc.text(`${exp.position} - ${exp.company}`, 20, y);
+      y += 6;
+      doc.text(
+        `${exp.startDate} até ${exp.isCurrent ? "Presente" : exp.endDate}`,
+        20,
+        y
+      );
+      y += 6;
+      if (exp.description) {
+        doc.text(exp.description, 20, y, { maxWidth: 170 });
+        y += 10;
+      } else {
+        y += 4;
+      }
+    });
+
+    // 🔹 Rodapé (opcional)
+    doc.setFontSize(9);
+    doc.setTextColor(120);
+    doc.text("Gerado com CV Builder AI ✨", 20, 280);
+
+    doc.save("curriculo.pdf");
   };
 
   return (
@@ -64,14 +169,19 @@ export default function App() {
           <div className="flex items-center border rounded-lg px-3 py-1 bg-gray-50 dark:bg-gray-800 transition">
             <Key className="w-4 h-4 text-gray-500 dark:text-gray-300 mr-2" />
             <input
-              type="text"
+              type="password"
               placeholder="Cole sua API Key"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
               className="outline-none text-sm bg-transparent text-gray-900 dark:text-gray-100"
             />
           </div>
 
           {/* Botão Exportar PDF */}
-          <button className="bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-800 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
+          <button
+            onClick={exportPDF}
+            className="bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-800 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition"
+          >
             <Download className="w-4 h-4" />
             Exportar PDF
           </button>
@@ -90,6 +200,7 @@ export default function App() {
           </p>
 
           <div className="space-y-4">
+            {/* Nome */}
             <div>
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Nome Completo *
@@ -103,6 +214,8 @@ export default function App() {
                 className="w-full border rounded-lg px-3 py-2 mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               />
             </div>
+
+            {/* Email */}
             <div>
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Email *
@@ -116,6 +229,8 @@ export default function App() {
                 className="w-full border rounded-lg px-3 py-2 mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               />
             </div>
+
+            {/* Telefone */}
             <div>
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Telefone *
@@ -129,6 +244,8 @@ export default function App() {
                 className="w-full border rounded-lg px-3 py-2 mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               />
             </div>
+
+            {/* LinkedIn */}
             <div>
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 LinkedIn
@@ -142,6 +259,8 @@ export default function App() {
                 className="w-full border rounded-lg px-3 py-2 mt-1 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               />
             </div>
+
+            {/* Resumo */}
             <div>
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Resumo Profissional
@@ -153,7 +272,21 @@ export default function App() {
                 placeholder="Digite aqui seu resumo profissional..."
                 className="w-full border rounded-lg px-3 py-2 mt-1 h-24 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               />
+              <button
+                onClick={handleGenerateSummary}
+                className="mt-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg flex items-center gap-2 transition"
+              >
+                <Sparkles className="w-4 h-4" /> Gerar com IA
+              </button>
             </div>
+          </div>
+
+          {/* 🔽 Formulário de Experiências */}
+          <div className="mt-6">
+            <ExperienceForm
+              experiences={experiences}
+              setExperiences={setExperiences}
+            />
           </div>
         </div>
 
@@ -201,9 +334,17 @@ export default function App() {
               <h4 className="font-bold flex items-center gap-2 text-gray-800 dark:text-white">
                 <Briefcase className="w-4 h-4" /> Experiência Profissional
               </h4>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Suas experiências profissionais aparecerão aqui...
-              </p>
+              <ul className="text-sm text-gray-500 dark:text-gray-400 mt-2 space-y-2">
+                {experiences.length > 0 ? (
+                  experiences.map((exp) => (
+                    <li key={exp.id} className="border p-2 rounded">
+                      <strong>{exp.position}</strong> - {exp.company}
+                    </li>
+                  ))
+                ) : (
+                  <p>Suas experiências profissionais aparecerão aqui...</p>
+                )}
+              </ul>
             </div>
           </div>
         </div>
