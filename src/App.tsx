@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
   Mail,
@@ -17,9 +18,13 @@ import type { ExperienceItem } from "./types/cv.types";
 import ExperienceForm from "./components/Form/Experience";
 import { generateSummaryGemini } from "./services/aiService";
 import jsPDF from "jspdf";
+import { usePersistentState } from "./hooks/usePersistentState";
+import { useAutoSaveToast } from "./hooks/useAutoSaveToast";
+
 
 export default function App() {
-  const [formData, setFormData] = useState({
+  // Estado do formulário
+  const [formData, setFormData] = usePersistentState("cv-data", {
     nome: "",
     email: "",
     telefone: "",
@@ -27,8 +32,14 @@ export default function App() {
     resumo: "",
   });
 
+
+
+  const { ToastComponent } = useAutoSaveToast("cv-data", formData);
+
+
   const [experiences, setExperiences] = useState<ExperienceItem[]>([]);
   const [apiKey, setApiKey] = useState("");
+
   const { darkMode, setDarkMode } = useDarkMode();
 
   const handleChange = (
@@ -294,17 +305,14 @@ export default function App() {
             </h3>
             <div className="flex gap-4 text-sm text-gray-600 dark:text-gray-300 mt-2">
               <span className="flex items-center gap-1">
-                <Mail className="w-4 h-4" />{" "}
-                {formData.email || "seu.email@exemplo.com"}
+                <Mail className="w-4 h-4" /> {formData.email || "seu.email@exemplo.com"}
               </span>
               <span className="flex items-center gap-1">
-                <Phone className="w-4 h-4" />{" "}
-                {formData.telefone || "(11) 99999-9999"}
+                <Phone className="w-4 h-4" /> {formData.telefone || "(11) 99999-9999"}
               </span>
             </div>
             <p className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300 mt-1">
-              <Linkedin className="w-4 h-4" />{" "}
-              {formData.linkedin || "linkedin.com/in/seuusuario"}
+              <Linkedin className="w-4 h-4" /> {formData.linkedin || "linkedin.com/in/seuusuario"}
             </p>
 
             <p className="text-gray-500 dark:text-gray-400 mt-4">
@@ -341,6 +349,9 @@ export default function App() {
           </div>
         </div>
       </main>
+
+      {/* Toast de auto-save */}
+      <ToastComponent />
     </div>
   );
 }
