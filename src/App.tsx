@@ -16,6 +16,8 @@ import {
 import { useDarkMode } from "./hooks/useDarkMode";
 import type { ExperienceItem } from "./types/cv.types";
 import ExperienceForm from "./components/Form/Experience";
+import type { Skill } from "../../types/cv.types";
+import SkillsForm from "./components/Form/Skills";
 import { generateSummaryGemini } from "./services/aiService";
 import jsPDF from "jspdf";
 import { usePersistentState } from "./hooks/usePersistentState";
@@ -36,8 +38,9 @@ export default function App() {
 
   const { ToastComponent } = useAutoSaveToast("cv-data", formData);
 
-
+  
   const [experiences, setExperiences] = useState<ExperienceItem[]>([]);
+  const [skills, setSkills] = useState<Skill[]>([]);
   const [apiKey, setApiKey] = useState("");
 
   const { darkMode, setDarkMode } = useDarkMode();
@@ -280,7 +283,6 @@ export default function App() {
               </button>
             </div>
           </div>
-
           {/* 🔽 Formulário de Experiências */}
           <div className="mt-6">
             <ExperienceForm
@@ -288,7 +290,14 @@ export default function App() {
               setExperiences={setExperiences}
             />
           </div>
-        </div>
+
+          {/* 🔽 Formulário de Habilidades */}
+          <div className="mt-6">
+             <SkillsForm skills={skills} setSkills={setSkills} />
+          </div>
+      
+          </div>
+
 
         {/* Preview */}
         <div className="bg-white dark:bg-black shadow-md rounded-2xl overflow-hidden transition-colors duration-300">
@@ -323,11 +332,19 @@ export default function App() {
 
             <div className="mb-4">
               <h4 className="font-bold flex items-center gap-2 text-gray-800 dark:text-white">
-                <User className="w-4 h-4" /> Habilidades
-              </h4>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Suas habilidades aparecerão aqui conforme você adiciona...
-              </p>
+               <User className="w-4 h-4" /> Habilidades
+             </h4>
+              <ul className="text-sm text-gray-500 dark:text-gray-400 mt-2 space-y-1">
+                {skills.length > 0 ? (
+                skills.map((skill) => (
+                  <li key={skill.id}>
+                  <strong>{skill.name}</strong> - {skill.level}
+                  </li>
+                ))
+             ) : (
+                <p>Suas habilidades aparecerão aqui conforme você adiciona...</p>
+             )}
+             </ul>
             </div>
 
             <div>
