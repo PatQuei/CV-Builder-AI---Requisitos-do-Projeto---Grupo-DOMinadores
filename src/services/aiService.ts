@@ -1,3 +1,5 @@
+
+
 // src/services/aiService.ts
 interface FormData {
   nome: string;
@@ -14,11 +16,16 @@ interface Experience {
   endDate?: string;
   isCurrent: boolean;
 }
+interface Skill {
+  name: string;
+  level: string;
+}
 
 export async function generateSummaryGemini(
   apiKey: string,
   formData: FormData,
-  experiences: Experience[]
+  experiences: Experience[],
+  skills: Skill[]
 ) {
   const prompt = `
     Gere um resumo profissional em primeira pessoa, breve (até 5 linhas),
@@ -29,7 +36,10 @@ export async function generateSummaryGemini(
   Telefone: ${formData.telefone}
   LinkedIn: ${formData.linkedin}
   Resumo fornecido: ${formData.resumo || "Não informado"}
+  Habilidades:
+    ${skills.length > 0 ? skills.map((s) => `${s.name} (${s.level})`).join(", ") : "Nenhuma informada"}
   Experiências: ${experiences
+  
     //incluir skill aqui
       .map(
         (exp) =>

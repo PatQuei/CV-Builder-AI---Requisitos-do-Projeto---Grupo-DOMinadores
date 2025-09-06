@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   Mail,
@@ -16,13 +15,12 @@ import {
 import { useDarkMode } from "./hooks/useDarkMode";
 import type { ExperienceItem } from "./types/cv.types";
 import ExperienceForm from "./components/Form/Experience";
-import type { Skill } from "../../types/cv.types";
+import type { Skill } from "./types/cv.types";
 import SkillsForm from "./components/Form/Skills";
 import { generateSummaryGemini } from "./services/aiService";
 import jsPDF from "jspdf";
 import { usePersistentState } from "./hooks/usePersistentState";
 import { useAutoSaveToast } from "./hooks/useAutoSaveToast";
-
 
 export default function App() {
   // Estado do formulário
@@ -34,11 +32,8 @@ export default function App() {
     resumo: "",
   });
 
-
-
   const { ToastComponent } = useAutoSaveToast("cv-data", formData);
 
-  
   const [experiences, setExperiences] = useState<ExperienceItem[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
   const [apiKey, setApiKey] = useState("");
@@ -59,7 +54,8 @@ export default function App() {
       !formData.telefone ||
       !formData.linkedin ||
       !formData.resumo ||
-      experiences.length === 0
+      experiences.length === 0 ||
+      skills.length === 0
     ) {
       alert(
         "Por favor, preencha todas as informações (incluindo experiências) antes de gerar o resumo com IA."
@@ -73,7 +69,12 @@ export default function App() {
     }
 
     try {
-      const resumo = await generateSummaryGemini(apiKey, formData, experiences);
+      const resumo = await generateSummaryGemini(
+        apiKey,
+        formData,
+        experiences,
+        skills
+      );
       setFormData({ ...formData, resumo });
     } catch (error) {
       console.error(error);
@@ -120,7 +121,7 @@ export default function App() {
     doc.setFontSize(11);
     y += 10;
 
-    experiences.forEach((exp, i) => {
+    experiences.forEach((exp) => {
       doc.text(`${exp.position} - ${exp.company}`, 20, y);
       y += 6;
       doc.text(
@@ -293,11 +294,9 @@ export default function App() {
 
           {/* 🔽 Formulário de Habilidades */}
           <div className="mt-6">
-             <SkillsForm skills={skills} setSkills={setSkills} />
+            <SkillsForm skills={skills} setSkills={setSkills} />
           </div>
-      
-          </div>
-
+        </div>
 
         {/* Preview */}
         <div className="bg-white dark:bg-black shadow-md rounded-2xl overflow-hidden transition-colors duration-300">
@@ -314,14 +313,17 @@ export default function App() {
             </h3>
             <div className="flex gap-4 text-sm text-gray-600 dark:text-gray-300 mt-2">
               <span className="flex items-center gap-1">
-                <Mail className="w-4 h-4" /> {formData.email || "seu.email@exemplo.com"}
+                <Mail className="w-4 h-4" />{" "}
+                {formData.email || "seu.email@exemplo.com"}
               </span>
               <span className="flex items-center gap-1">
-                <Phone className="w-4 h-4" /> {formData.telefone || "(11) 99999-9999"}
+                <Phone className="w-4 h-4" />{" "}
+                {formData.telefone || "(11) 99999-9999"}
               </span>
             </div>
             <p className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300 mt-1">
-              <Linkedin className="w-4 h-4" /> {formData.linkedin || "linkedin.com/in/seuusuario"}
+              <Linkedin className="w-4 h-4" />{" "}
+              {formData.linkedin || "linkedin.com/in/seuusuario"}
             </p>
 
             <p className="text-gray-500 dark:text-gray-400 mt-4">
@@ -332,19 +334,21 @@ export default function App() {
 
             <div className="mb-4">
               <h4 className="font-bold flex items-center gap-2 text-gray-800 dark:text-white">
-               <User className="w-4 h-4" /> Habilidades
-             </h4>
+                <User className="w-4 h-4" /> Habilidades
+              </h4>
               <ul className="text-sm text-gray-500 dark:text-gray-400 mt-2 space-y-1">
                 {skills.length > 0 ? (
-                skills.map((skill) => (
-                  <li key={skill.id}>
-                  <strong>{skill.name}</strong> - {skill.level}
-                  </li>
-                ))
-             ) : (
-                <p>Suas habilidades aparecerão aqui conforme você adiciona...</p>
-             )}
-             </ul>
+                  skills.map((skill) => (
+                    <li key={skill.id}>
+                      <strong>{skill.name}</strong> - {skill.level}
+                    </li>
+                  ))
+                ) : (
+                  <p>
+                    Suas habilidades aparecerão aqui conforme você adiciona...
+                  </p>
+                )}
+              </ul>
             </div>
 
             <div>
